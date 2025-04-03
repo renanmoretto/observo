@@ -30,8 +30,8 @@ app.secret_key = os.getenv('OBSERVO_SECRET_KEY', os.urandom(24))
 
 class WatchedFile:
     def __init__(self, path: Path, name: str | None = None):
-        self.name = name or path.name
-        self.path = path
+        self.path = Path(path)
+        self.name = name or self.path.name
 
     @property
     def size(self) -> str:
@@ -224,5 +224,5 @@ def get_asgi_app():
     return WsgiToAsgi(app)
 
 
-def run(host: str = '0.0.0.0', port: int = 8080, debug: bool = False, **kwargs):
+def run(host: str = '0.0.0.0', port: int = 5000, debug: bool = False, **kwargs):
     app.run(host=host, port=port, debug=debug, **kwargs)

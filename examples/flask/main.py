@@ -1,4 +1,4 @@
-import observo
+import observo as observo
 from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
