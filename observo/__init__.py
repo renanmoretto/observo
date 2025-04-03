@@ -48,6 +48,8 @@ class WatchedDirectory:
         self.path = path
 
     def list_files(self) -> list[WatchedFile]:
+        if not self.path.exists():
+            return []
         return [WatchedFile(file) for file in self.path.iterdir()]
 
     def to_dict(self) -> dict:
