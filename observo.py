@@ -18,7 +18,7 @@ from flask import (
 )
 
 
-_OBSERVO_DIR = Path(__file__).parent.parent
+_OBSERVO_DIR = Path(__file__).parent
 _TEMPLATES_DIR = _OBSERVO_DIR / 'templates'
 auth_username = os.getenv('OBSERVO_USERNAME')
 auth_password = os.getenv('OBSERVO_PASSWORD')
