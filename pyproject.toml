@@ -1,0 +1,18 @@
+[project]
+name = "observo"
+version = "0.1.1"
+description = "Add your description here"
+authors = [
+    {name = "Renan Moretto",email = "renan_moretto@outlook.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "asgiref>=3.8.0",
+    "flask>=3.0.0",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
