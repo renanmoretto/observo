@@ -140,7 +140,6 @@ def index():
 @app.route('/file/<path:file_path>')
 @_login_required
 def file_detail(file_path: str):
-    print(file_path)
     file_path = Path(file_path)
     if not file_path.exists():
         abort(404)
