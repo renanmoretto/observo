@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>observo</title>
+    <style>
+        body { font-family: monospace; margin: 40px; }
+        .file-list { list-style: none; padding: 0; }
+        .file-list li { margin: 10px 0; }
+        .file-list a { text-decoration: none; color: #2c3e50; }
+        .file-list a:hover { color: #919191; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>observo</h1>
+        {% if is_logged_in %}
+            <a href="{{ url_for('logout') }}" class="file-list">Logout</a>
+        {% endif %}
+    </div>
+    {% if watched_dirs %}
+        {% for watched_dir in watched_dirs %}
+            <h2>{{watched_dir.title}}</h2>
+            <ul class="file-list">
+            {% for file in watched_dir.files %}
+                <li>
+                    <a href="{{ url_for('file_detail', file_path=file.path) }}">{{file.name}}</a>
+                    <a href="{{ url_for('file_detail', file_path=file.path) }}?download=true">download /</a>
+                    <a href="#" onclick="clearLog('{{ file.path }}'); return false;" class="file-list">clear /</a>
+                    <a href="#" onclick="deleteLog('{{ file.path }}'); return false;" class="file-list">delete</a>
+                </li>
+            {% endfor %}
+            </ul>
+            <div style="margin-bottom: 30px;"></div>
+        {% endfor %}
+        <div style="margin-bottom: 40px;"></div>
+    {% endif %}
+    {% if watched_files %}
+        <h2>files</h2>
+        <ul class="file-list">
+            {% for file in watched_files %}
+                <li><a href="{{ url_for('file_detail', file_path=file.path) }}">{{file.name}}</a></li>
+            {% endfor %}
+    {% endif %}
+</body>
+<script>
+    function clearLog(file_path) {
+        if (confirm('Are you sure you want to clear this log file?')) {
+            fetch("{{ url_for('clear_file', file_path=file_path) }}", {
+                method: 'POST',
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error clearing log file');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error clearing log file');
+            });
+        }
+    }
+    function deleteLog(file_path) {
+        if (confirm('Are you sure you want to delete this log file?')) {
+            fetch("{{ url_for('delete_file', file_path=file_path) }}", {
+                method: 'POST',
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error deleting log file');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting log file');
+            });
+        }
+    }
+    </script>
+</html>

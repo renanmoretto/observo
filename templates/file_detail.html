@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ filename }}</title>
+    <style>
+        body { font-family: monospace; margin: 40px; }
+        pre { background: #f8f9fa; padding: 20px; border-radius: 5px; }
+        .header { margin-bottom: 20px; }
+        .header a { text-decoration: none; color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{{ url_for('index') }}">← back to files</a>
+        <h2>{{ file_path.name }}</h2>
+        <a href="{{ url_for('file_detail', file_path=file_path) }}?download=true">download file</a>
+        <a>/</a>
+        <button onclick="clearLog('{{ file_path }}')" style="border: none; background: none; color: #2c3e50; cursor: pointer; font-family: monospace;">clear file</button>
+        <a>/</a>
+        <button onclick="deleteLog('{{ file_path }}')" style="border: none; background: none; color: #2c3e50; cursor: pointer; font-family: monospace;">delete file</button>
+    </div>
+    <pre>{{ file_content }}</pre>
+
+    <script>
+    function clearLog(file_path) {
+        if (confirm('Are you sure you want to clear this log file?')) {
+            fetch("{{ url_for('clear_file', file_path=file_path) }}", {
+                method: 'POST',
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error clearing log file');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error clearing log file');
+            });
+        }
+    }
+    function deleteLog(file_path) {
+        if (confirm('Are you sure you want to delete this log file?')) {
+            fetch("{{ url_for('delete_file', file_path=file_path) }}", {
+                method: 'POST',
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error deleting log file');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting log file');
+            });
+        }
+    }
+    </script>
+</body>
+</html>
