@@ -1,7 +1,9 @@
 import os
+import random
+import string
+import datetime
 from pathlib import Path
 from functools import wraps
-import datetime
 
 from flask import (
     Flask,
@@ -23,7 +25,12 @@ auth_password = os.getenv('OBSERVO_PASSWORD')
 
 
 app = Flask(__name__, template_folder=str(_TEMPLATES_DIR))
-app.secret_key = os.getenv('OBSERVO_SECRET_KEY', os.urandom(24))
+app.secret_key = os.getenv(
+    'OBSERVO_SECRET_KEY',
+    ''.join(
+        random.choice(string.ascii_letters + string.digits) for _ in range(32)
+    ),
+)
 
 app.config['SESSION_COOKIE_NAME'] = 'osession'
 app.config['SESSION_COOKIE_PATH'] = os.getenv('OBSERVO_COOKIE_PATH', '/')
