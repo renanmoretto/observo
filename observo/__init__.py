@@ -25,23 +25,11 @@ auth_password = os.getenv('OBSERVO_PASSWORD')
 
 
 app = Flask(__name__, template_folder=str(_TEMPLATES_DIR))
-app.secret_key = os.getenv(
-    'OBSERVO_SECRET_KEY',
-    ''.join(
-        random.choice(string.ascii_letters + string.digits) for _ in range(32)
-    ),
+app.secret_key = ''.join(
+    random.choice(string.ascii_letters + string.digits) for _ in range(32)
 )
-
 app.config['SESSION_COOKIE_NAME'] = 'osession'
-app.config['SESSION_COOKIE_PATH'] = os.getenv('OBSERVO_COOKIE_PATH', '/')
-app.config['SESSION_COOKIE_SECURE'] = (
-    os.getenv('OBSERVO_COOKIE_SECURE', 'False').lower() == 'true'
-)
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['PERMANENT_SESSION_LIFETIME'] = int(
-    os.getenv('OBSERVO_SESSION_LIFETIME', 86400)
-)  # 1 day
+app.config['SESSION_COOKIE_PATH'] = '/o'
 
 
 class WatchedFile:
@@ -129,7 +117,7 @@ def login():
             (auth_username is None or username == auth_username)
             and password == auth_password
         ):
-            session.permanent = True  # Make session permanent based on PERMANENT_SESSION_LIFETIME
+            session.permanent = True
             session['logged_in'] = True
             return redirect(url_for('index'))
         else:
@@ -159,7 +147,6 @@ def index():
 @app.route('/file/<path:file_path>')
 @_login_required
 def file_detail(file_path: str):
-    # Normalize the path to handle both slash types
     normalized_path = file_path.replace('\\', '/').replace('//', '/')
     file_path = Path(normalized_path)
 
@@ -190,7 +177,6 @@ def file_detail(file_path: str):
 @app.route('/file/<path:file_path>/delete', methods=['POST'])
 @_login_required
 def delete_file(file_path):
-    # Normalize the path to handle both slash types
     normalized_path = file_path.replace('\\', '/').replace('//', '/')
     file_path = Path(normalized_path)
 
@@ -209,7 +195,6 @@ def delete_file(file_path):
 @app.route('/file/<path:file_path>/clear', methods=['POST'])
 @_login_required
 def clear_file(file_path):
-    # Normalize the path to handle both slash types
     normalized_path = file_path.replace('\\', '/').replace('//', '/')
     file_path = Path(normalized_path)
 
@@ -239,33 +224,6 @@ def watch_file(path: str | Path, name: str | None = None):
     watched_files.append(WatchedFile(path=path, name=name))
 
 
-# def configure_session(
-#     cookie_name: str = 'observo_session',
-#     cookie_path: str = '/',
-#     cookie_secure: bool = False,
-#     cookie_httponly: bool = True,
-#     cookie_samesite: str = 'Lax',
-#     lifetime_seconds: int = 86400,
-# ):
-#     """
-#     Configure the session settings for Observo
-
-#     Args:
-#         cookie_name: The name of the session cookie
-#         cookie_path: The path for the session cookie
-#         cookie_secure: Whether the cookie should be sent only over HTTPS
-#         cookie_httponly: Whether the cookie should be accessible only via HTTP(S)
-#         cookie_samesite: Samesite setting for the cookie ('Lax', 'Strict', or 'None')
-#         lifetime_seconds: Session lifetime in seconds (default: 1 day)
-#     """
-#     app.config['SESSION_COOKIE_NAME'] = cookie_name
-#     app.config['SESSION_COOKIE_PATH'] = cookie_path
-#     app.config['SESSION_COOKIE_SECURE'] = cookie_secure
-#     app.config['SESSION_COOKIE_HTTPONLY'] = cookie_httponly
-#     app.config['SESSION_COOKIE_SAMESITE'] = cookie_samesite
-#     app.config['PERMANENT_SESSION_LIFETIME'] = lifetime_seconds
-
-
 def get_wsgi_app():
     return app
 
@@ -274,6 +232,10 @@ def get_asgi_app():
     from asgiref.wsgi import WsgiToAsgi
 
     return WsgiToAsgi(app)
+
+
+def set_cookie_path(path: str):
+    app.config['SESSION_COOKIE_PATH'] = path
 
 
 def run(host: str = '0.0.0.0', port: int = 5000, debug: bool = False, **kwargs):
