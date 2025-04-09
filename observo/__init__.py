@@ -1,6 +1,5 @@
 import os
-import random
-import string
+import hashlib
 import datetime
 from pathlib import Path
 from functools import wraps
@@ -23,13 +22,17 @@ _TEMPLATES_DIR = _OBSERVO_DIR / 'templates'
 auth_username = os.getenv('OBSERVO_USERNAME')
 auth_password = os.getenv('OBSERVO_PASSWORD')
 
+if auth_password is not None:
+    _key = b'observo-' + auth_password.encode('utf8')
+    secret_key = hashlib.sha256(_key).hexdigest()
+else:
+    secret_key = 'observo-secret-key'
+
 
 app = Flask(__name__, template_folder=str(_TEMPLATES_DIR))
-app.secret_key = ''.join(
-    random.choice(string.ascii_letters + string.digits) for _ in range(32)
-)
+app.secret_key = secret_key
 app.config['SESSION_COOKIE_NAME'] = 'osession'
-app.config['SESSION_COOKIE_PATH'] = '/o'
+app.config['SESSION_COOKIE_PATH'] = '/'
 
 
 class WatchedFile:
@@ -210,6 +213,21 @@ def clear_file(file_path):
     return redirect(url_for('index'))
 
 
+# funcs
+
+
+def set_username(username: str):
+    global auth_username
+    auth_username = username
+
+
+def set_password(password: str):
+    global auth_password
+    auth_password = password
+    _key = b'observo-' + auth_password.encode('utf8')
+    app.secret_key = hashlib.sha256(_key).hexdigest()
+
+
 def watch(title: str, path: str | Path):
     global watched_dirs
     watched_dirs.append(WatchedDirectory(title=title, path=Path(path)))
@@ -225,12 +243,16 @@ def watch_file(path: str | Path, name: str | None = None):
 
 
 def get_wsgi_app():
+    # Use default root cookie path to work with any mount point
+    app.config['SESSION_COOKIE_PATH'] = '/'
     return app
 
 
 def get_asgi_app():
     from asgiref.wsgi import WsgiToAsgi
 
+    # Use default root cookie path to work with any mount point
+    app.config['SESSION_COOKIE_PATH'] = '/'
     return WsgiToAsgi(app)
 
 

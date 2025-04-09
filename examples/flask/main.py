@@ -4,6 +4,7 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 app = Flask(__name__)
 
+observo.set_password('1234')
 observo.watch_logs()
 observo_app = observo.get_wsgi_app()
 
