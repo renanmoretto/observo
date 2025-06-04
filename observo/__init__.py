@@ -147,7 +147,7 @@ def index():
     )
 
 
-@app.route('/file/<path:file_path>')
+@app.route('/file/<path:file_path>', methods=['GET', 'POST'])
 @_login_required
 def file_detail(file_path: str):
     normalized_path = file_path.replace('\\', '/').replace('//', '/')
@@ -177,7 +177,7 @@ def file_detail(file_path: str):
         return redirect(url_for('index'))
 
 
-@app.route('/file/<path:file_path>/delete', methods=['POST', 'DELETE'])
+@app.route('/file/<path:file_path>', methods=['DELETE'])
 @_login_required
 def delete_file(file_path):
     normalized_path = file_path.replace('\\', '/').replace('//', '/')
@@ -188,11 +188,9 @@ def delete_file(file_path):
 
     try:
         file_path.unlink()
-        flash(f'File {file_path.name} deleted successfully')
+        return 'File deleted', 200
     except Exception as e:
-        flash(f'Error deleting log file: {str(e)}')
-
-    return redirect(url_for('index'))
+        return str(e), 500
 
 
 @app.route('/file/<path:file_path>/clear', methods=['POST'])
