@@ -100,7 +100,7 @@
             })
             .then(response => {
                 if (response.ok) {
-                    window.location.href = '/';  // Use href to force a GET request
+                    window.location.href = "{{ url_for('index') }}";
                 } else {
                     alert('Error deleting file');
                 }
