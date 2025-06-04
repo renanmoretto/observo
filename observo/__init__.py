@@ -177,7 +177,7 @@ def file_detail(file_path: str):
         return redirect(url_for('index'))
 
 
-@app.route('/file/<path:file_path>/delete', methods=['POST'])
+@app.route('/file/<path:file_path>/delete', methods=['POST', 'DELETE'])
 @_login_required
 def delete_file(file_path):
     normalized_path = file_path.replace('\\', '/').replace('//', '/')

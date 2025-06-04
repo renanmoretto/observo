@@ -26,8 +26,8 @@
                 <li>
                     <a href="{{ url_for('file_detail', file_path=file.path) }}">{{file.name}}</a>
                     <a href="{{ url_for('file_detail', file_path=file.path) }}?download=true">download /</a>
-                    <a href="#" onclick="clearLog('{{ file.path }}'); return false;" class="file-list">clear /</a>
-                    <a href="#" onclick="deleteLog('{{ file.path }}'); return false;" class="file-list">delete</a>
+                    <a href="{{ url_for('clear_file', file_path=file.path) }}" onclick="clearLog('{{ file.path }}'); return false;" class="file-list">clear /</a>
+                    <a href="{{ url_for('delete_file', file_path=file.path) }}" onclick="deleteLog('{{ file.path }}'); return false;" class="file-list">delete</a>
                 </li>
             {% endfor %}
             </ul>
